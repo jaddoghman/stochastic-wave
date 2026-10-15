@@ -21,7 +21,7 @@ $$
 W(t, x) = \sum_{k \geq 1}\sqrt{q_{k}}\beta_{k}(t)\phi_{k}(x), \qquad (t, x) \in [0, T] \times [0, L],
 $$
 
-where $\{\phi_{k}(x)\}_{k \geq 1}$ is an orthonormal basis of $L^{2}(0, L)$ defined by $\phi_{k}(x) = \sqrt{2/L}\sin(k\pi x/L)$, $\{\beta_{k}\}_{k \geq 1}$ is a family of mutually independent identically distributed real-valued Brownian motions, $q_{k} = \lambda_{k}^{-s}$, and $\{\lambda_{k}\}_{k \geq 1}$ is the set of eigenvalues of $-\Delta$ associated with $\{\phi_{k}\}_{k \geq 1}$ defined by $\lambda_{k} = (k\pi/L)^{2}$.
+where $`\{\phi_{k}(x)\}_{k \geq 1}`$ is an orthonormal basis of $`L^{2}(0, L)`$ defined by $`\phi_{k}(x) = \sqrt{2/L}\sin(k\pi x/L)`$, $`\{\beta_{k}\}_{k \geq 1}`$ is a family of mutually independent identically distributed real-valued Brownian motions, $`q_{k} = \lambda_{k}^{-s}`$, and $`\{\lambda_{k}\}_{k \geq 1}`$ is the set of eigenvalues of $`-\Delta`$ associated with $`\{\phi_{k}\}_{k \geq 1}`$ defined by $`\lambda_{k} = (k\pi/L)^{2}`$.
 
 
 ## Reference
