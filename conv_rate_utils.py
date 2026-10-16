@@ -20,14 +20,17 @@ def _spatial_convergence_rate_seq(wave_tools: SimpleNamespace, T: float, L: floa
     compute_l2_error_sq = wave_tools.l2_squared_error  # Function
 
     # Initializations
+    print("[1/2] Initializing reference and coarse solvers...")
     Nx_ref = Nx_values[-1]  # Reference solution mesh size
     K = Nx_ref-2  # Number of Wiener modes
     rng = np.random.default_rng(seed)
     ref = wave_solver(T, L, Nt, Nx_ref, s, K)  # Reference solver
     coarse = np.array([wave_solver(T, L, Nt, nx, s, K) for nx in Nx_values[:-1]])  # Solvers on different meshes
     dx_values = np.array([L / float(nx-1) for nx in Nx_values[:-1]], dtype=float)
+    print("[1/2] Initialization complete.")
 
     # Monte Carlo simulation
+    print("[2/2] Solving...")
     errors = np.zeros(coarse.size, dtype=float)
     for _ in tqdm(range(M), desc="Monte Carlo iterations"):
         xi = rng.normal(size=(K, Nt-1))
@@ -36,6 +39,7 @@ def _spatial_convergence_rate_seq(wave_tools: SimpleNamespace, T: float, L: floa
             u_coarse = solver.solve(xi)  # Solution on coarse mesh
             errors[i] += compute_l2_error_sq(ref, solver, u_ref, u_coarse)
     errors /= float(M)
+    print("[2/2] Solve complete. \n")
 
     return dx_values, np.sqrt(errors)
 
@@ -72,18 +76,22 @@ def _spatial_convergence_rate_par(wave_tools: SimpleNamespace, T: float, L: floa
     child_seeds = seed_seq.spawn(M)  # M independent child seed sequences
 
     # Convergence rate components
+    print("[1/2] Initializing reference and coarse solvers...")
     Nx_ref = Nx_values[-1]  # Reference solution mesh size
     K = Nx_ref-2  # Number of Wiener modes
     ref = wave_tools.wave_solver(T, L, Nt, Nx_ref, s, K)  # Reference solver
     coarse = np.array([wave_tools.wave_solver(T, L, Nt, nx, s, K) for nx in Nx_values[:-1]])  # Solvers on ≠ meshes
     dx_values = np.array([L / float(nx - 1) for nx in Nx_values[:-1]], dtype=float)
+    print("[1/2] Initialization complete.")
 
+    print("[2/2] Solving...")
     errors = np.zeros(coarse.size, dtype=float)
     with ProcessPoolExecutor(initializer=_init_worker, initargs=(L, Nt, Nx_values, ref, coarse, wave_tools)) as executor:
         results = executor.map(_single_path_convergence_rate, child_seeds, chunksize=max(1, M // (4*cpu_count())))
         for path_errors in tqdm(results, total=M, desc="Monte Carlo iterations"):
             errors += path_errors
     errors /= float(M)
+    print("[2/2] Solve complete. \n")
 
     return dx_values, np.sqrt(errors)
 
