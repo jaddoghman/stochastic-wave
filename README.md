@@ -94,6 +94,95 @@ $$
 for all $`n \in \{1, \dotsc, N_{t}-2\}`$.
 The reader may refer to [3] for further details.
 
+## Solvers
+
+The repository contains finite element (`wave_fe.py`) and finite difference (`wave_fd.py`) solvers encapsulated in `StoWaveFEMSolver` and `StoWaveFDSolver` as Python classes.
+To keep this repository self-contained, the $P_{1}$ elements along with some associated features are implemented in `FiniteElements` inside `wave_fe.py`.
+The finite element solver can be invoked as follows:
+
+```python
+solver_fe = StoWaveFEMSolver(T, L, Nt, Nx, s, K)  # Create fem solver
+u_fe = solver_fe.solve(xi)  # Compute fem solution
+```
+
+where `K` is the number of (truncated) Wiener modes, and `xi` $\sim \mathcal{N}(0, 1)$ is an array of size $(K, N_{t}-1)$.
+The computed finite element solution `u_fe` is pathwise and can vary from one simulation to another.
+
+The finite difference solver preserves the same syntax and outputs:
+
+```python
+solver_fd = StoWaveFDSolver(T, L, Nt, Nx, s, K)  # Create fd solver
+u_fd = solver_fd.solve(xi)  # Compute fd solution
+```
+
+## Convergence rate analysis
+
+The spatial convergence rate analysis involves Monte Carlo simulations, which can make the overall computational cost high.
+The repository `conv_rate_utils.py` implements convergence rate functions in sequential and parallel modes; each function includes both underlying numerical methods to avoid code duplication.
+The sequential and parallel implementations are all wrapped in one function:
+
+```python
+spatial_convergence_rate(solver_tools, T, L, Nt, Nx_values, M, s, seed, parallel)
+```
+
+where `solver_tools` is a SimpleNamespace with attributes `wave_solver` and `l2_squared_error`, `M` is the number of Monte Carlo samples, `seed` is an integer for reproducible random results, and `parallel` is a boolean to switch between sequential and parallel mode.
+This function returns two arrays containing the spatial step size and the $L^{2}(\Omega; L^{2}(0, L))$ error at time $T$, where $\Omega$ is the probability set.
+
+This same repository provides a function to plot the computed spatial convergence rate of the displacement solution $u$:
+
+```python
+plot_convergence_rate(dx_values, errors, s, method_name)
+```
+
+where `dx_values` and `errors` are produced by `spatial_convergence_rate`, `s` is the decay rate of $Q = \Lambda^{-s}$, and `method_name` is a string (e.g., FEM or FD).
+In addition to plotting, this function returns the theoretical order, which can be compared with the numerical order using NumPy's `polyfit` function.
+
+### Theoretical results
+
+Given that the stochastic wave equation is implemented in 1D, the finite element and finite difference solvers have equivalent spatial convergence rates.
+Based on [2], the $L^{2}$ spatial convergence rate is $2\beta/3$, where $\beta \in [0, 3]$ is the regularity of the solution.
+In short, $\beta < 1+s-d/2$ when $s>0$ and $\beta < 1-d/2$ if $s=0$, where $d$ is the spatial dimension.
+
+## Features
+
+* One-dimensional linear stochastic wave equation solvers
+* Finite element spatial discretization
+* Finite difference spatial discretization
+* Explicit stochastic trigonometric time integrator
+* Automated computation of $L^{2}$ errors
+* Numerical convergence analysis
+* Sequential and Parallelized functions
+* Validation of theoretical results
+
+## Requirements
+
+* Python 3.x
+* NumPy
+* Scipy
+* threadpoolctl
+* tqdm
+
+Additional packages may be required depending on the plotting and post-processing tools used.
+
+## Running
+
+Run a finite element simulation with
+
+```bash
+python3 wave_fe.py
+```
+
+or a finite difference simulation with
+
+```bash
+python3 wave_fd.py
+```
+
+## Purpose
+
+This repository was developed as a numerical study of explicit trigonometric time integration for finite element and finite difference discretizations of hyperbolic partial differential equations.
+It is intended for educational and research purposes, particularly for verifying implementations and investigating convergence behavior.
+
 ## Reference
 
 [1] D. Cohen. On the numerical discretisation of stochastic oscillators, Math. Comput. Simul., (2012). doi:10.1016/j.matcom.2012.02.004.
