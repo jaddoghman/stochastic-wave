@@ -8,14 +8,14 @@ The underlying partial differential equation reads
 $$
 \begin{cases}
   \begin{aligned}
-    &\mathrm{d}u = v\mathrm{d}t, \qquad &&\mbox{in } (0, T) \times [0, L], \\
-    &dv - \Delta u \mathrm{d}t = \mathrm{d}W, && \mbox{in } (0, T) \times (0, L), \\
-    &u(0, \cdot) = u_{0}, \quad v(0, \cdot) = v_{0}, && \mbox{in } [0, L].
+    \mathrm{d}u = v\mathrm{d}t, \qquad &\mbox{in } (0, T) \times [0, L], \\
+    dv - \Delta u \mathrm{d}t = \mathrm{d}W, & \mbox{in } (0, T) \times (0, L), \\
+    u(0, \cdot) = u_{0}, \quad v(0, \cdot) = v_{0}, & \mbox{in } [0, L].
   \end{aligned}
 \end{cases}
 $$
 
-The noise $W$ is a $Q$-**Wiener process**, cylindrical or correlated, with covariance operator $`Q = (-\Delta)^{-s}`$, $s \geq 0$, allowing its Karhunen-Loeve expansion to be expressed in terms of the Dirichlet Laplacian eigenbasis as follows:
+The noise $W$ is a **Wiener process**, cylindrical or correlated, with covariance operator $`Q = (-\Delta)^{-s}`$, $s \geq 0$, allowing its Karhunen-Loève expansion to be expressed in terms of the Dirichlet Laplacian eigenbasis as follows:
 
 $$
 W(t, x) = \sum_{k \geq 1}\sqrt{q_{k}}\beta_{k}(t)\phi_{k}(x), \qquad (t, x) \in [0, T] \times [0, L],
@@ -40,18 +40,18 @@ Setting $\Omega_{\Delta x} = \Lambda_{\Delta x}^{1/2}$, $C_{\Delta x}^{\Delta t}
 
 $$
 \begin{cases}
-  & U^{n} = C_{\Delta x}^{\Delta t}U^{n-1} + \Omega_{\Delta x}^{-1}S_{\Delta x}^{\Delta t}(V^{n-1} + \Delta_{n}W), \\
-  & V^{n} = -\Omega_{\Delta x}S_{\Delta x}^{\Delta t}U^{n-1} + C_{\Delta x}^{\Delta t}(V^{n-1} + \Delta_{n}W),
+  U^{n} = C_{\Delta x}^{\Delta t}U^{n-1} + \Omega_{\Delta x}^{-1}S_{\Delta x}^{\Delta t}(V^{n-1} + \Delta_{n}W), \\
+  V^{n} = -\Omega_{\Delta x}S_{\Delta x}^{\Delta t}U^{n-1} + C_{\Delta x}^{\Delta t}(V^{n-1} + \Delta_{n}W),
 \end{cases}
 $$
 
-where $`(\Delta_{n}W)_{i} = W(t_{n}, x_{i}) - W(t_{n-1}, x_{i}) = \sum_{k=1}^{K}\sqrt{q_{k}}\Delta_{n}\beta_{k}\phi_{k}(x_{i})`$, with $`\Delta_{n}\beta_{k} \sim \mathcal{N}(0, \Delta t)`$.
+where $`(\Delta_{n}W)_{i} = W(t_{n}, x_{i}) - W(t_{n-1}, x_{i}) \approx \sum_{k=1}^{K}\sqrt{q_{k}}\Delta_{n}\beta_{k}\phi_{k}(x_{i})`$, with $K \leq N_{x}-2$ the number of modes and $`\Delta_{n}\beta_{k} \sim \mathcal{N}(0, \Delta t)`$.
 Alternatively, the above fully discrete scheme can be turned into the following two-step recurrence:
 
 $$
 \begin{cases}
-  & U^{n+1} = 2C_{\Delta x}^{\Delta t}U^{n} - U^{n-1} + \Omega_{\Delta x}^{-1}S_{\Delta x}^{\Delta t}\Delta_{n+1}W, \\
-  & U^{1} = C_{\Delta x}^{\Delta t}U^{0} + \Omega_{\Delta}^{-1}S_{\Delta x}^{\Delta t}(V^{0} + \Delta_{1}W)
+  U^{n+1} = 2C_{\Delta x}^{\Delta t}U^{n} - U^{n-1} + \Omega_{\Delta x}^{-1}S_{\Delta x}^{\Delta t}\Delta_{n+1}W, \\
+  U^{1} = C_{\Delta x}^{\Delta t}U^{0} + \Omega_{\Delta x}^{-1}S_{\Delta x}^{\Delta t}(V^{0} + \Delta_{1}W)
 \end{cases}
 $$
 
@@ -61,7 +61,7 @@ For more details on the finite difference scheme, the reader may refer to [4].
 ### Finite element method
 
 For notation consistency, denote $h = \Delta x$, and $\Lambda_{h} = -\Delta$.
-The $P_{1}$ elements are adopted, the corresponding finite element space is of dimension $N_{x}-2$ due to the homogeneous Dirichlet boundary conditions, and the associated mass and stiffness matrices are denoted by $M$ and $K$, respectively.
+The $P_{1}$ elements are adopted, the corresponding finite element space is of dimension $N_{x}-2$ due to the homogeneous Dirichlet boundary conditions, and the associated mass matrix is denoted by $M$.
 Denote by $`\{\varphi_{i}\}_{1 \leq i \leq N_{x}-2}`$ (not to be confused with $\phi_{i}$) the set of hat functions defined over $[0, L]$.
 The discrete eigenpairs of the approximated Dirichlet Laplacian $\Lambda_{h}$ are given by:
 
@@ -70,24 +70,23 @@ $$
 $$
 
 where $\theta_{k} = k\pi h/L$, for all $`i, k \in \{1, \dotsc, N_{x}-2\}`$.
-The coordinate representation of the discrete Laplace operator in the nodal basis is $\Lambda_{h} = M^{-1}K$, but does not require an explicit computation since it is diagonalizable and can be replaced by its diagonal matrix.
 By jointly applying the finite element method and the explicit stochastic trigonometric time integrator, the fully discrete scheme reads
 
 $$
 \begin{cases}
-  & U^{n} = C_{h}^{\Delta t}U^{n-1} + \Omega_{h}^{-1}S_{h}^{\Delta t}(V^{n-1} + M^{-1}\Delta_{n}W), \\
-  & V^{n} = -\Omega_{h}S_{h}^{\Delta t}U^{n-1} + C_{h}^{\Delta t}(V^{n-1} + M^{-1}\Delta_{n}W),
+  U^{n} = C_{h}^{\Delta t}U^{n-1} + \Omega_{h}^{-1}S_{h}^{\Delta t}(V^{n-1} + M^{-1}\Delta_{n}W), \\
+  V^{n} = -\Omega_{h}S_{h}^{\Delta t}U^{n-1} + C_{h}^{\Delta t}(V^{n-1} + M^{-1}\Delta_{n}W),
 \end{cases}
 $$
 
-where $\Omega_{h} = \Lambda_{h}$, $C_{h}^{\Delta t} = \cos(\Delta t\Omega_{h})$, $S_{h}^{\Delta t} = \sin(\Delta t\Omega_{h})$, and $`(\Delta_{n}W)_{i} = \sum_{k=1}^{K}\sqrt{q_{k}}\Delta_{n}\beta_{k}\int_{0}^{L}\phi_{k}\varphi_{i}\mathrm{d}x`$, with $\Delta_{n}\beta_{k} \sim \mathcal{N}(0, \Delta t)$.
+where $\Omega_{h} = \Lambda_{h}^{1/2}$, $C_{h}^{\Delta t} = \cos(\Delta t\Omega_{h})$, $S_{h}^{\Delta t} = \sin(\Delta t\Omega_{h})$, and $`(\Delta_{n}W)_{i} \approx \sum_{k=1}^{K}\sqrt{q_{k}}\Delta_{n}\beta_{k}\int_{0}^{L}\phi_{k}\varphi_{i}\mathrm{d}x`$, with $K \geq N_{x}-2$ (see [2]) and $\Delta_{n}\beta_{k} \sim \mathcal{N}(0, \Delta t)$.
 The discrete noise term $M^{-1}\Delta_{n}W$ is simply the $L^{2}$ projection of $\Delta_{n}W$ onto the finite element space, and does not require forming $M^{-1}$.
 The above fully discrete scheme can be recast as a two-step recurrence:
 
 $$
 \begin{cases}
-  & U^{n+1} = 2C_{h}^{\Delta t}U^{n} - U^{n-1} + \Omega_{h}^{-1}S_{h}^{\Delta t}M^{-1}\Delta_{n+1}W, \\
-  & U^{1} = C_{h}^{\Delta t}U^{0} + \Omega_{h}^{-1}S_{h}^{\Delta t}(V^{0} + M^{-1}\Delta_{1}W),
+  U^{n+1} = 2C_{h}^{\Delta t}U^{n} - U^{n-1} + \Omega_{h}^{-1}S_{h}^{\Delta t}M^{-1}\Delta_{n+1}W, \\
+  U^{1} = C_{h}^{\Delta t}U^{0} + \Omega_{h}^{-1}S_{h}^{\Delta t}(V^{0} + M^{-1}\Delta_{1}W),
 \end{cases}
 $$
 
@@ -106,7 +105,7 @@ u_fe = solver_fe.solve(xi)  # Compute fem solution
 ```
 
 where `K` is the number of (truncated) Wiener modes, and `xi` $\sim \mathcal{N}(0, 1)$ is an array of size $(K, N_{t}-1)$.
-The computed finite element solution `u_fe` is pathwise and can vary from one simulation to another.
+The computed finite element solution `u_fe` is a single sample path (realization) and can vary from one simulation to another.
 
 The finite difference solver preserves the same syntax and outputs:
 
@@ -118,17 +117,18 @@ u_fd = solver_fd.solve(xi)  # Compute fd solution
 ## Convergence rate analysis
 
 The spatial convergence rate analysis involves Monte Carlo simulations, which can make the overall computational cost high.
-The repository `conv_rate_utils.py` implements convergence rate functions in sequential and parallel modes; each function includes both underlying numerical methods to avoid code duplication.
-The sequential and parallel implementations are all wrapped in one function:
+The module `conv_rate_utils.py` implements convergence rate functions in sequential and parallel modes; each function includes both underlying numerical methods to avoid code duplication.
+The sequential and parallel implementations are both wrapped in one function:
 
 ```python
 spatial_convergence_rate(solver_tools, T, L, Nt, Nx_values, M, s, seed, parallel)
 ```
 
-where `solver_tools` is a SimpleNamespace with attributes `wave_solver` and `l2_squared_error`, `M` is the number of Monte Carlo samples, `seed` is an integer for reproducible random results, and `parallel` is a boolean to switch between sequential and parallel mode.
-This function returns two arrays containing the spatial step size and the $L^{2}(\Omega; L^{2}(0, L))$ error at time $T$, where $\Omega$ is the probability set.
+where `solver_tools` is a SimpleNamespace with attributes `wave_solver` and `l2_squared_error`, `M` is the number of Monte Carlo samples (not to be confused with the mass matrix), `seed` is an integer for reproducible random results, and `parallel` is a boolean to switch between sequential and parallel modes.
+This function returns two arrays containing the spatial step size and the $L^{2}(\Omega; L^{2}(0, L))$ error at time $T$, where $\Omega$ is the probability space.
+Since the method of manufactured solutions cannot be used to obtain an exact solution, the spatial convergence rate is assessed by comparing a reference solution computed on a fine mesh with other solutions obtained on coarser meshes.
 
-This same repository provides a function to plot the computed spatial convergence rate of the displacement solution $u$:
+This same module provides a function to plot the computed spatial convergence rate of the displacement solution $u$:
 
 ```python
 plot_convergence_rate(dx_values, errors, s, method_name)
@@ -139,9 +139,9 @@ In addition to plotting, this function returns the theoretical order, which can 
 
 ### Theoretical results
 
-Given that the stochastic wave equation is implemented in 1D, the finite element and finite difference solvers have equivalent spatial convergence rates.
-Based on [2], the $L^{2}$ spatial convergence rate is $2\beta/3$, where $\beta \in [0, 3]$ is the regularity of the solution.
-In short, $\beta < 1+s-d/2$ when $s>0$ and $\beta < 1-d/2$ if $s=0$, where $d$ is the spatial dimension.
+Given that the stochastic wave equation is implemented in 1D, the finite element and finite difference solvers have equivalent spatial convergence rates (same eigenvectors, both with eigenvalue error $`\mathcal{O}(k^{4}h^{2})`$).
+Based on [2], the theoretical $L^{2}$ spatial convergence rate (upper bound) is $2\beta/3$, where $\beta \in [0, 3]$ is the regularity of the solution.
+In short, for $s \geq 0$, $\beta < 1+s-d/2$, where $d$ is the spatial dimension.
 
 ## Features
 
@@ -161,6 +161,7 @@ In short, $\beta < 1+s-d/2$ when $s>0$ and $\beta < 1-d/2$ if $s=0$, where $d$ i
 * Scipy
 * threadpoolctl
 * tqdm
+* matplotlib
 
 Additional packages may be required depending on the plotting and post-processing tools used.
 
@@ -183,12 +184,12 @@ python3 wave_fd.py
 This repository was developed as a numerical study of explicit trigonometric time integration for finite element and finite difference discretizations of hyperbolic partial differential equations.
 It is intended for educational and research purposes, particularly for verifying implementations and investigating convergence behavior.
 
-## Reference
+## References
 
 [1] D. Cohen. On the numerical discretisation of stochastic oscillators, Math. Comput. Simul., (2012). doi:10.1016/j.matcom.2012.02.004.
 
 [2] M. Kovács, S. Larsson, F. Saedpanah. Finite element approximation of the linear stochastic wave equation with additive noise, SIAM J. Numer. Anal., (2010), doi:10.1137/090772241.
 
-[3] D. Cohem, S. Larsson, M. Sigg. A trigonometric method for the linear stochastic wave equation, SIAM J. Numer. Anal., (2013). doi:10.1137/12087030X.
+[3] D. Cohen, S. Larsson, M. Sigg. A trigonometric method for the linear stochastic wave equation, SIAM J. Numer. Anal., (2013). doi:10.1137/12087030X.
 
-[4] D. Cohen, L. Quer-Sardanyons. A fully discrete approximation of the one-dimensional stochastic wave equation, IMAJNA, (2015), doi:10.1093/imanum/drn000
+[4] D. Cohen, L. Quer-Sardanyons. A fully discrete approximation of the one-dimensional stochastic wave equation, IMAJNA, (2016), doi:10.1093/imanum/drv006
